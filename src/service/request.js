@@ -30,7 +30,6 @@ request.interceptors.request.use((config) => {
 //响应拦截器
 request.interceptors.response.use(async (response) => {
     // nProgress.done();
-    // console.log("response", response);
     if (response.data.code === 4111) {
         const router = new HashRouter()
         let result = await reqLogOut()

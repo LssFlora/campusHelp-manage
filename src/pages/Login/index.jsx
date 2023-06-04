@@ -4,10 +4,8 @@ import { Card } from 'antd';
 import { Button, Form, Input, message } from 'antd';
 import urlAddress from "../../utils/urlAddress"
 import { reqLogin } from '../../service/api';
-import store from "../../Redux/store"
-import CryptoJS from 'crypto-js';
-import crypto from "../../utils/crypto"
-import getCode from "./static/clickGetCode.png"
+import store from '../../Redux/store';
+
 
 
 const MyFormItemContext = React.createContext([]);
@@ -29,12 +27,8 @@ export default function Login() {
     const navigateTo = useNavigate()
     const [loginForm, setLoginForm] = useState({})
     const onFinish = (value) => {
-        // console.log("form finish", value);
     };
-    // 刷新获得验证码
-    const refresh = () => {
-        loginForm.userName ? document.getElementById("codeImg").src = urlAddress + "/api/captcha" + "?time=" + new Date().getTime() : message.error("请输入用户名", [3])
-    }
+
     // 输入登录信息
     const handleChange = (e) => {
         const { value } = e.target
@@ -67,18 +61,24 @@ export default function Login() {
             if (localStorage.getItem("TOKEN")) localStorage.setItem("TOKEN", "")
             let result = await reqLogin(loginForm)
             if (result.code == 200) {
-                console.log(" login result", result);
                 localStorage.setItem("TOKEN", result.token)
                 message.success("登录成功", [3])
                 // 存账户角色
-                navigateTo("/home/roleOverView")
+                store.dispatch({ type: "setUserInfo", data: result.data.useInfo })
+                result.data.useInfo.authority == 1 ? navigateTo("/home/userList", { state: { userInfo: result.data.useInfo } }) : navigateTo("/home/fixHall", { state: { userInfo: result.data.useInfo } })
             } else {
                 message.error(result.msg, [3])
             }
         }
     }
-    const deleteUserYes = async () => {
 
+    const refresh = () => {
+        loginForm.userName
+            ? (document.getElementById(
+                "codeImg"
+            ).src = `${urlAddress}/user/login/getCode/${loginForm.userName
+            }?time=${new Date().getTime()}`)
+            : message.error("请输入用户名", [3]);
     }
 
     return (
@@ -87,35 +87,35 @@ export default function Login() {
                 <img src={require("./static/loginBg.png")} style={{ height: "100%", width: "100%" }} alt="" />
             </div>
             <div id="right" style={{ height: "100vh", width: "50%", float: "left", display: "flex", justifyContent: "space-around", alignItems: "center" }}>
-                <Card title="Welcome to IR System(管理员端)" bordered={false} style={{ width: "60%", height: "60%", flex: "1", marginTop: "-70px" }} headStyle={{ color: "#4966df", fontSize: "1.75rem" }}>
+                <Card title="欢迎来到校园帮管理端" bordered={false} style={{ width: "60%", height: "60%", flex: "1", marginTop: "-70px" }} headStyle={{ color: "#4966df", fontSize: "1.75rem" }}>
                     <Form name="form_item_path" layout="vertical" onFinish={onFinish} style={{ width: "50%", margin: "0 auto" }}>
                         <MyFormItemGroup prefix={['user']}>
                             <MyFormItemGroup prefix={['name']}>
-                                <MyFormItem name="username" label={<label style={{ fontWeight: 500 }}>Username</label>} >
+                                <MyFormItem name="username" label={<label style={{ fontWeight: 500 }}>账号</label>} >
                                     <Input onChange={(e) => handleChange(e)} id="userName" />
                                 </MyFormItem>
-                                <MyFormItem name="password" label={<label style={{ fontWeight: 500 }}>Password</label>}>
+                                <MyFormItem name="password" label={<label style={{ fontWeight: 500 }}>密码</label>}>
                                     <Input.Password onChange={(e) => handleChange(e)} id="password" />
                                 </MyFormItem>
                             </MyFormItemGroup>
 
-                            <MyFormItem name="code" label={<label style={{ fontWeight: 500 }}>Verification Code</label>}>
+                            <MyFormItem name="code" label={<label style={{ fontWeight: 500 }}>验证码</label>}>
                                 <div>
                                     <Input style={{ width: "69%" }} onChange={(e) => handleChange(e)} id="code" />
                                     <img
                                         height="30px"
                                         width="30%"
-                                        style={{ marginLeft: "3px", borderRadius: "7px", float: "right", width: "29%" }}
-                                        id="codeImg"
-                                        src={getCode}
+                                        style={{ marginLeft: "3px", borderRadius: "7px", float: "right", width: "29%", cursor: 'pointer' }}
                                         onClick={refresh}
+                                        src="https://campus-help-picture.oss-cn-beijing.aliyuncs.com/Login/Code/clickGetCode.png"
+                                        id="codeImg"
                                     />
                                 </div>
                             </MyFormItem>
                         </MyFormItemGroup>
 
                         <Button type="primary" htmlType="submit" style={{ width: "100%" }} onClick={goLogin}>
-                            Login
+                            登录
                         </Button>
                     </Form>
                 </Card>

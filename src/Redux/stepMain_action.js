@@ -46,3 +46,9 @@ export const setTelephone = (data) => {
         data
     }
 }
+export const setUserInfo = (data) => {
+    return {
+        type: "setUserInfo",
+        data
+    }
+}

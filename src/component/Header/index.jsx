@@ -35,7 +35,7 @@ export default function Home() {
                 className='headerTitle'
                 onClick={goHome}
             >
-                IR System 管理员端
+                校园帮管理端
             </span>
             <LogoutOutlined className='headerIconStyle' onClick={comfirmLogOut} />
             <Modal title="确认退出登录？" open={isModalOpen} onOk={logOutYes} onCancel={logOutNo}>

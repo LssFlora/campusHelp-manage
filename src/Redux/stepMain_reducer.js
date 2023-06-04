@@ -6,7 +6,8 @@ const initState = {
     insurantId: "",
     insureStatus: "",
     isNewRegi: "",
-    telephone: ""
+    telephone: "",
+    userInfo: {}
 }
 const stepMainReducer = (preState = initState, action) => {
     const { type, data } = action
@@ -37,6 +38,9 @@ const stepMainReducer = (preState = initState, action) => {
             return preState
         case "setTelephone":
             preState = { ...preState, telephone: data }
+            return preState
+        case "setUserInfo":
+            preState = { ...preState, userInfo: data }
             return preState
     }
 }

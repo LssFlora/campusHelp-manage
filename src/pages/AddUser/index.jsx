@@ -1,14 +1,17 @@
 import { Button, Form, Input, Select, message, Spin } from 'antd';
 import { useState } from 'react';
-import { reqRegiUser } from '../../service/api';
-import CryptoJS from 'crypto-js';
-import roleReplace from '../../utils/roleReplace';
+import { reqAddUser } from '../../service/api';
+import { useNavigate } from 'react-router-dom';
+
 
 
 
 const App = () => {
     const [newForm, setNewForm] = useState({})
     const [isLoading, setIsLoading] = useState(false)
+    const navigateTo = useNavigate()
+
+
 
     const handleInputChange = (e) => {
         switch (e.target.id) {
@@ -22,19 +25,15 @@ const App = () => {
                 break;
         }
     }
-    const selectChange = (e) => {
-        console.log("select e", e);
-        setNewForm({ ...newForm, role: roleReplace(e) })
-    }
     const addUser = async () => {
-        setIsLoading(true)
-        console.log("newForm", newForm);
-        let result = await reqRegiUser(newForm)
+        let result = await reqAddUser(newForm)
         if (result.code == 200) {
-            setIsLoading(false)
             message.success("添加成功", [3])
+            navigateTo("/home/userList")
+
         } else {
-            setIsLoading(false)
+            message.error(result.msg, [3])
+
         }
     }
     return (
@@ -56,7 +55,7 @@ const App = () => {
         >
             <Form.Item
                 label="账号"
-                name="username"
+                name="userName"
                 rules={[
                     {
                         required: true,
@@ -66,7 +65,6 @@ const App = () => {
             >
                 <Input onChange={handleInputChange} id="userName" />
             </Form.Item>
-
             <Form.Item
                 label="密码"
                 name="password"
@@ -77,53 +75,19 @@ const App = () => {
                     },
                 ]}
             >
-                <Input.Password onChange={handleInputChange} id="password" />
+                <Input onChange={handleInputChange} id="password" />
             </Form.Item>
-            <Form.Item
-                label="身份"
-                rules={[
-                    {
-                        required: true,
-                        message: '请选择身份!',
-                    },
-                ]}
-            >
-                <Select
-                    id='role'
-                    style={{
-                        width: 120,
-                    }}
-                    onChange={selectChange}
-                    // onChange={handleChange}
-                    options={[
-                        {
-                            value: '登记员',
-                            label: '登记员',
-                        },
-                        {
-                            value: '评估员',
-                            label: '评估员',
-                        },
-                        {
-                            value: '报销员',
-                            label: '报销员',
-                        },
-                        {
-                            value: '管理员',
-                            label: '管理员',
-                        },
-                    ]}
-                />
-            </Form.Item>
-
-
             <Form.Item
                 wrapperCol={{
                     offset: 8,
                     span: 16,
                 }}
             >
-                <Button type="primary" htmlType="submit" onClick={addUser}>
+                <Button
+                    type="primary"
+                    htmlType="submit"
+                    onClick={addUser}
+                >
                     创建
                 </Button>
             </Form.Item>
